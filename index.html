@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dota 2 战绩查询</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0b0e14;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            gap: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #1a1d24 0%, #12151c 100%);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #2a2d35;
+        }
+
+        .avatar-section {
+            position: relative;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            border: 3px solid #e94560;
+        }
+
+        .rank-badge {
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .player-info {
+            flex: 1;
+        }
+
+        .player-name {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .player-name span {
+            color: #888;
+            font-size: 1rem;
+            font-weight: normal;
+        }
+
+        .player-names {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #2a2d35;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .stat-value.win { color: #4caf50; }
+        .stat-value.loss { color: #f44336; }
+        .stat-value.rate { color: #2196f3; }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Search */
+        .search-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            max-width: 300px;
+            padding: 12px 20px;
+            border: 2px solid #2a2d35;
+            border-radius: 8px;
+            background: #1a1d24;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+
+        .search-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #2a2d35;
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .tab.active {
+            background: #e94560;
+            color: #fff;
+        }
+
+        /* Matches */
+        .matches-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .match-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 200px 100px;
+            gap: 15px;
+            align-items: center;
+            padding: 15px 20px;
+            background: #1a1d24;
+            border-radius: 8px;
+            border: 1px solid #2a2d35;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .match-row:hover {
+            border-color: #e94560;
+            transform: translateX(5px);
+        }
+
+        .hero-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hero-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #2a2d35, #1a1d24);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #e94560;
+        }
+
+        .hero-name {
+            font-weight: 600;
+        }
+
+        .result-section {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .result-badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            width: fit-content;
+        }
+
+        .result-badge.win {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+
+        .result-badge.loss {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+
+        .match-info {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .kda-section {
+            text-align: center;
+        }
+
+        .kda {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .kda .kills { color: #4caf50; }
+        .kda .deaths { color: #f44336; }
+        .kda .assists { color: #2196f3; }
+
+        /* Match Detail */
+        .match-detail {
+            display: none;
+            margin-top: 10px;
+            padding: 20px;
+            background: #12151c;
+            border-radius: 8px;
+            border: 1px solid #2a2d35;
+        }
+
+        .match-detail.active {
+            display: block;
+        }
+
+        .teams-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .team {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+        }
+
+        .team-header {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2a2d35;
+        }
+
+        .team-header.radiant { color: #4caf50; }
+        .team-header.dire { color: #f44336; }
+
+        .team-player {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .team-player:last-child {
+            border-bottom: none;
+        }
+
+        .player-hero {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-hero-icon {
+            width: 30px;
+            height: 30px;
+            background: #2a2d35;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .player-stats {
+            display: flex;
+            gap: 15px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Loading/Error */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #888;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e94560;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            color: #f44336;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .match-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Search -->
+        <div class="search-section">
+            <input type="text" id="steamIdInput" class="search-input" placeholder="输入 Steam ID" value="109902856">
+            <button class="search-btn" onclick="handleSearch()">查询</button>
+        </div>
+
+        <!-- Player Header -->
+        <div id="playerHeader" class="header" style="display: none;">
+            <div class="avatar-section">
+                <img id="playerAvatar" class="avatar" src="" alt="avatar">
+            </div>
+            <div class="player-info">
+                <h1 class="player-name">
+                    <span id="playerName">-</span>
+                </h1>
+                <div class="player-names" id="playerNames"></div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statGames">-</div>
+                        <div class="stat-label">总场次</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value win" id="statWins">-</div>
+                        <div class="stat-label">胜场</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value loss" id="statLosses">-</div>
+                        <div class="stat-label">负场</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value rate" id="statWinRate">-</div>
+                        <div class="stat-label">胜率</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statImp">-</div>
+                        <div class="stat-label">IMP</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statLastMatch">-</div>
+                        <div class="stat-label">最后比赛</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs" id="tabs" style="display: none;">
+            <button class="tab active" onclick="showTab('matches')">比赛记录</button>
+            <button class="tab" onclick="showTab('heroes')">英雄</button>
+            <button class="tab" onclick="showTab('activity')">活动</button>
+        </div>
+
+        <!-- Content -->
+        <div id="content">
+            <div class="loading">加载中...</div>
+        </div>
+    </div>
+
+    <script>
+        const HERO_DISPLAY_NAMES = {
+            1: "Anti-Mage", 2: "Axe", 3: "Bane", 4: "Bloodseeker", 5: "Crystal Maiden",
+            6: "Drow Ranger", 7: "Earthshaker", 8: "Juggernaut", 9: "Mirana", 10: "Morphling",
+            11: "Phantom Lancer", 12: "Puck", 13: "Pudge", 14: "Razor", 15: "Sand King",
+            16: "Storm Spirit", 17: "Sven", 18: "Tiny", 19: "Vengeful Spirit", 20: "Windrunner",
+            21: "Zeus", 22: "Kunkka", 23: "Lina", 24: "Shadow Shaman", 25: "Slark",
+            26: "Tidehunter", 27: "Witch Doctor", 28: "Lich", 29: "Riki", 30: "Enigma",
+            31: "Tinker", 32: "Sniper", 33: "Necrophos", 34: "Warlock", 35: "Beastmaster",
+            36: "Queen of Pain", 37: "Venomancer", 38: "Faceless Void", 39: "Skeleton King", 40: "Death Prophet",
+            41: "Phantom Assassin", 42: "Pugna", 43: "Templar Assassin", 44: "Viper", 45: "Luna",
+            46: "Dragon Knight", 47: "Dazzle", 48: "Clockwerk", 49: "Leshrac", 50: "Nature's Prophet",
+            51: "Lifestealer", 52: "Dark Seer", 53: "Clinkz", 54: "Omniknight", 55: "Enchantress",
+            56: "Huskar", 57: "Night Stalker", 58: "Broodmother", 59: "Weaver", 60: "Jakiro",
+            61: "Batrider", 62: "Chen", 63: "Spectre", 64: "Ancient Apparition", 65: "Keeper of the Light",
+            66: "Wisp", 67: "Brewmaster", 68: "Shadow Demon", 69: "Lone Druid", 70: "Chaos Knight",
+            71: "Meepo", 72: "Visage", 73: "Dark Willow", 74: "Rubick", 75: "Disruptor",
+            76: "Gyrocopter", 77: "Alchemist", 78: "Invoker", 79: "Silencer", 80: "Outworld Devourer",
+            81: "Lycan", 82: "Naga Siren", 83: "Ogre Magi", 84: "Tomb Raider", 85: "Ursula",
+            86: "Luna", 87: "Winter Wyvern", 88: "Treant Protector", 89: "Nyx Assassin",
+            90: "Kobold", 91: "Snapfire", 92: "Magnus", 93: "Hoodwink", 94: "Mars",
+            95: "Primal Beast", 96: "Void Spirit", 97: "Ember Spirit", 98: "Techies",
+            99: "Marci", 100: "Ringmaster", 101: "Abaddon", 102: "Monkey King", 103: "Dark Willow",
+            104: "Pangolier", 105: "Grimstroke", 106: "Dawnbreaker", 107: "Oracle", 108: "Pit Lord",
+            109: "Teaf", 110: "Muerta", 111: "Dawnbreaker", 112: "Bounty Hunter", 113: "Spirit Breaker",
+            114: "Clockwerk", 115: "Shadow Shaman", 116: "Tiny", 117: "Anti-Mage", 118: "Mirana",
+            119: "Shadow Fiend", 120: "Morphling", 121: "Terrorblade", 122: "Vengeful Spirit",
+            123: "Windrunner", 124: "Zeus", 125: "Kunkka", 126: "Lina", 127: "Lion",
+            128: "Shadow Shaman", 129: "Ogre Magi", 130: "Sven", 131: "Riki", 132: "Enigma",
+            133: "Tidehunter", 134: "Necrophos", 135: "Beastmaster", 136: "Queen of Pain",
+            137: "Viper", 138: "Pugna", 139: "Batrider", 140: "Chen", 141: "Spectre"
+        };
+
+        function getHeroName(heroId) {
+            return HERO_DISPLAY_NAMES[heroId] || `Hero ${heroId}`;
+        }
+
+        function formatDate(timestamp) {
+            if (!timestamp) return "-";
+            const date = new Date(timestamp * 1000);
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            if (days === 0) return "今天";
+            if (days === 1) return "昨天";
+            if (days < 7) return `${days}天前`;
+            return date.toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" });
+        }
+
+        function showLoading(msg = "加载中...") {
+            return `<div class="loading">${msg}</div>`;
+        }
+
+        function showError(msg) {
+            return `<div class="error">${msg}</div>`;
+        }
+
+        async function handleSearch() {
+            const steamId = document.getElementById("steamIdInput").value.trim();
+            if (!steamId) return;
+
+            document.getElementById("content").innerHTML = showLoading("正在查询数据...");
+
+            try {
+                const response = await fetch(`/api/fetch?steamId=${steamId}`);
+                const result = await response.json();
+
+                if (!result.success) {
+                    document.getElementById("content").innerHTML = showError(result.error);
+                    return;
+                }
+
+                const data = result.data;
+                renderPlayerHeader(data.player);
+                renderMatches(data.matches, steamId, data);
+
+                document.getElementById("playerHeader").style.display = "flex";
+                document.getElementById("tabs").style.display = "flex";
+
+            } catch (error) {
+                document.getElementById("content").innerHTML = showError(error.message);
+            }
+        }
+
+        function renderPlayerHeader(player) {
+            if (!player) return;
+
+            const name = player.steamAccount?.name || (Array.isArray(player.names) && player.names[0]?.name) || "Unknown";
+            const avatar = player.steamAccount?.avatar || "";
+            const names = Array.isArray(player.names) ? player.names.map(n => n.name || n).filter(Boolean).slice(0, 5) : [];
+
+            document.getElementById("playerAvatar").src = avatar;
+            document.getElementById("playerName").textContent = name;
+            document.getElementById("playerNames").textContent = names.length > 0 ? `曾用名: ${names.join(" / ")}` : "";
+
+            const totalGames = player.matchCount || 0;
+            const wins = player.winCount || 0;
+            const losses = totalGames - wins;
+            const winRate = totalGames > 0 ? ((wins / totalGames) * 100).toFixed(1) : 0;
+            const imp = player.imp || 0;
+            const lastMatch = formatDate(player.lastMatchDate);
+
+            document.getElementById("statGames").textContent = totalGames;
+            document.getElementById("statWins").textContent = wins;
+            document.getElementById("statLosses").textContent = losses;
+            document.getElementById("statWinRate").textContent = winRate + "%";
+            document.getElementById("statImp").textContent = imp > 0 ? "+" + imp : imp;
+            document.getElementById("statLastMatch").textContent = lastMatch;
+        }
+
+        function renderMatches(matches, steamId, data) {
+            if (!matches || matches.length === 0) {
+                document.getElementById("content").innerHTML = "<div class='error'>暂无比赛记录</div>";
+                return;
+            }
+
+            const steamIdNum = parseInt(steamId);
+
+            let html = `<div class="matches-list">`;
+
+            matches.forEach((match, index) => {
+                const player = match.players?.find(p => p.steamAccountId === steamIdNum);
+                const heroId = player?.heroId || 0;
+                const heroName = getHeroName(heroId);
+                const kills = player?.kills ?? 0;
+                const deaths = player?.deaths ?? 0;
+                const assists = player?.assists ?? 0;
+
+                const isRadiant = player?.isRadiant ?? true;
+                const didRadiantWin = match.didRadiantWin;
+                const isWin = isRadiant === didRadiantWin;
+
+                const radiantPlayers = match.players?.filter(p => p.isRadiant) || [];
+                const direPlayers = match.players?.filter(p => !p.isRadiant) || [];
+
+                html += `
+                    <div>
+                        <div class="match-row" onclick="toggleDetail(${index})">
+                            <div class="hero-section">
+                                <div class="hero-icon">${heroName.charAt(0)}</div>
+                                <div class="hero-name">${heroName}</div>
+                            </div>
+                            <div class="result-section">
+                                <div class="result-badge ${isWin ? 'win' : 'loss'}">${isWin ? '胜利' : '失败'}</div>
+                                <div class="match-info">
+                                    ${formatDate(match.startDateTime)} · ${Math.floor(match.durationSeconds / 60)}:${String(match.durationSeconds % 60).padStart(2, '0')}
+                                </div>
+                            </div>
+                            <div class="kda-section">
+                                <div class="kda">
+                                    <span class="kills">${kills}</span> /
+                                    <span class="deaths">${deaths}</span> /
+                                    <span class="assists">${assists}</span>
+                                </div>
+                                <div class="match-info">KDA</div>
+                            </div>
+                        </div>
+                        <div class="match-detail" id="detail-${index}">
+                            <div class="teams-grid">
+                                <div class="team">
+                                    <div class="team-header radiant">天辉 ${didRadiantWin ? '✓ 胜利' : '✗ 失败'}</div>
+                                    ${radiantPlayers.map(p => `
+                                        <div class="team-player" style="${p.steamAccountId === steamIdNum ? 'color:#e94560;font-weight:bold;' : ''}">
+                                            <div class="player-hero">
+                                                <div class="player-hero-icon">${getHeroName(p.heroId).charAt(0)}</div>
+                                                <span>${getHeroName(p.heroId)}</span>
+                                            </div>
+                                            <div class="player-stats">
+                                                <span>${p.kills}/${p.deaths}/${p.assists}</span>
+                                            </div>
+                                        </div>
+                                    `).join("")}
+                                </div>
+                                <div class="team">
+                                    <div class="team-header dire">夜魇 ${didRadiantWin ? '✗ 失败' : '✓ 胜利'}</div>
+                                    ${direPlayers.map(p => `
+                                        <div class="team-player" style="${p.steamAccountId === steamIdNum ? 'color:#e94560;font-weight:bold;' : ''}">
+                                            <div class="player-hero">
+                                                <div class="player-hero-icon">${getHeroName(p.heroId).charAt(0)}</div>
+                                                <span>${getHeroName(p.heroId)}</span>
+                                            </div>
+                                            <div class="player-stats">
+                                                <span>${p.kills}/${p.deaths}/${p.assists}</span>
+                                            </div>
+                                        </div>
+                                    `).join("")}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            document.getElementById("content").innerHTML = html;
+        }
+
+        function toggleDetail(index) {
+            const detail = document.getElementById(`detail-${index}`);
+            if (detail.classList.contains("active")) {
+                detail.classList.remove("active");
+            } else {
+                detail.classList.add("active");
+            }
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+            event.target.classList.add("active");
+            // For now, only matches tab works
+            if (tab !== "matches") {
+                document.getElementById("content").innerHTML = "<div class='loading'>该功能开发中...</div>";
+            }
+        }
+
+        // Enter key to search
+        document.getElementById("steamIdInput").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") handleSearch();
+        });
+
+        // Auto search on load
+        window.addEventListener("load", handleSearch);
+    </script>
+</body>
+</html>

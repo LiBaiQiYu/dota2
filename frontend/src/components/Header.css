@@ -1,0 +1,146 @@
+/* Header */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: linear-gradient(135deg, #1a1d24 0%, #12151c 100%);
+  border-bottom: 1px solid #2a2d35;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #e94560, #ff6b6b);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-left: 48px;
+  flex: 1;
+}
+
+.nav-item {
+  font-size: 14px;
+  font-weight: 500;
+  color: #888888;
+  text-decoration: none;
+  padding: 8px 0;
+  position: relative;
+  transition: color 0.2s;
+}
+
+.nav-item:hover {
+  color: #e94560;
+}
+
+.nav-item.active {
+  color: #ffffff;
+}
+
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #e94560;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #888888;
+  transition: all 0.2s;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #e94560;
+}
+
+.header-search {
+  position: relative;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-input {
+  width: 240px;
+  height: 40px;
+  padding: 0 16px;
+  border: 2px solid #2a2d35;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  background: #1a1d24;
+  color: #ffffff;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  border-color: #e94560;
+}
+
+.search-input::placeholder {
+  color: #666666;
+}
+
+.search-submit {
+  height: 40px;
+  padding: 0 24px;
+  background: linear-gradient(135deg, #e94560, #ff6b6b);
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  color: #ffffff;
+}
+
+.search-submit:hover {
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-nav {
+    display: none;
+  }
+
+  .header {
+    padding: 0 16px;
+  }
+}

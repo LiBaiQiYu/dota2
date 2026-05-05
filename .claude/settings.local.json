@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node fetch_data.js 70388657)",
+      "Bash(curl -s --connect-timeout 5 http://localhost:3001/api/fetch?steamId=109902856)"
+    ]
+  }
+}

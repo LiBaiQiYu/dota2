@@ -1,0 +1,137 @@
+/* Player Header Card */
+.player-header-card {
+  background: linear-gradient(135deg, #1a1d24 0%, #12151c 100%);
+  border: 1px solid #2a2d35;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.player-main {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.player-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  border: 3px solid #e94560;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.player-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.player-names {
+  font-size: 12px;
+  color: #666666;
+  margin: 0;
+}
+
+.player-id {
+  font-size: 12px;
+  color: #666666;
+  margin: 0;
+}
+
+.player-stats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.stat-value.win {
+  color: #4caf50;
+}
+
+.stat-value.loss {
+  color: #f44336;
+}
+
+.stat-value.rate {
+  color: #2196f3;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #666666;
+  margin-top: 4px;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: #2a2d35;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .player-header-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .player-stats {
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #2a2d35;
+  }
+
+  .stat-divider {
+    display: none;
+  }
+
+  .stat-item {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .player-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .player-avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .player-name {
+    font-size: 18px;
+  }
+
+  .stat-value {
+    font-size: 18px;
+  }
+}

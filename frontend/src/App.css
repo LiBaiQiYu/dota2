@@ -1,0 +1,121 @@
+/* App Layout */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-layout {
+  display: flex;
+  flex: 1;
+  padding-top: 64px;
+  padding-bottom: 48px;
+}
+
+.content {
+  flex: 1;
+  margin-left: 200px;
+  padding: 24px;
+  background: #0b0e14;
+  min-height: calc(100vh - 64px - 48px);
+  transition: margin-left 0.3s;
+}
+
+.content.sidebar-collapsed {
+  margin-left: 64px;
+}
+
+/* Cards */
+.card {
+  background: #1a1d24;
+  border: 1px solid #2a2d35;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  border-bottom: 1px solid #2a2d35;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.card-count {
+  font-size: 12px;
+  color: #666666;
+}
+
+.card-content {
+  padding: 24px;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 24px;
+  color: #666666;
+  font-size: 14px;
+}
+
+.empty-state-full {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  color: #666666;
+  font-size: 14px;
+}
+
+/* Loading & Error */
+.loading {
+  text-align: center;
+  padding: 60px 24px;
+  color: #888888;
+  font-size: 14px;
+}
+
+.loading::after {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e94560;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error {
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  border-radius: 8px;
+  padding: 16px 24px;
+  text-align: center;
+  color: #f44336;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content {
+    margin-left: 0;
+    padding: 16px;
+  }
+
+  .content.sidebar-collapsed {
+    margin-left: 0;
+  }
+}
