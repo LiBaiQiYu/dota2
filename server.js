@@ -76,7 +76,7 @@ async function fetchPlayerData(steamId) {
   const matchesQuery = `
     query GetPlayerMatches($steamAccountId: Long!) {
       player(steamAccountId: $steamAccountId) {
-        matches(request: {}) {
+        matches(request: {skip: 0, take: 100}) {
           id
           didRadiantWin
           durationSeconds
@@ -88,6 +88,9 @@ async function fetchPlayerData(steamId) {
             matchId
             playerSlot
             steamAccountId
+            steamAccount {
+              name
+            }
             isRadiant
             isVictory
             heroId
@@ -152,6 +155,71 @@ async function fetchPlayerData(steamId) {
     }
   `;
 
+  const matchDetailQuery = `
+    query GetMatchDetails($matchIds: [Long]!) {
+      matches(ids: $matchIds) {
+        id
+        didRadiantWin
+        durationSeconds
+        startDateTime
+        bottomLaneOutcome
+        midLaneOutcome
+        topLaneOutcome
+        players {
+          matchId
+          playerSlot
+          steamAccountId
+          steamAccount {
+            name
+          }
+          isRadiant
+          isVictory
+          heroId
+          gameVersionId
+          kills
+          deaths
+          assists
+          leaverStatus
+          numLastHits
+          numDenies
+          goldPerMinute
+          networth
+          experiencePerMinute
+          level
+          gold
+          goldSpent
+          heroDamage
+          towerDamage
+          heroHealing
+          partyId
+          isRandom
+          lane
+          position
+          streakPrediction
+          intentionalFeeding
+          role
+          roleBasic
+          imp
+          award
+          item0Id
+          item1Id
+          item2Id
+          item3Id
+          item4Id
+          item5Id
+          backpack0Id
+          backpack1Id
+          backpack2Id
+          neutral0Id
+          behavior
+          invisibleSeconds
+          dotaPlusHeroXp
+          variant
+        }
+      }
+    }
+  `;
+
   try {
     console.log("Fetching player info...");
     const playerData = await graphql(playerQuery, { steamAccountId: parseInt(steamId) });
@@ -166,7 +234,7 @@ async function fetchPlayerData(steamId) {
       steamId: steamId,
       timestamp: new Date().toISOString(),
       player: playerData.player,
-      matches: (matchesData.player?.matches || []).slice(0, 25),
+      matches: (matchesData.player?.matches || []).slice(0, 100),
       heroes: heroesData.constants?.heroes || []
     };
 

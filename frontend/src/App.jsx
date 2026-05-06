@@ -13,13 +13,27 @@ function App() {
   const [activeMenu, setActiveMenu] = useState('overview')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
+  // Handle URL query parameter on mount
   useEffect(() => {
-    fetchPlayer('109902856')
+    const params = new URLSearchParams(window.location.search)
+    const urlSteamId = params.get('steamId')
+    if (urlSteamId) {
+      fetchPlayer(urlSteamId)
+    } else {
+      fetchPlayer('109902856')
+    }
   }, [])
 
   const handleSearch = (steamId) => {
     fetchPlayer(steamId)
     setActiveMenu('overview')
+  }
+
+  const handlePlayerClick = (steamAccountId) => {
+    fetchPlayer(steamAccountId)
+    setActiveMenu('overview')
+    // Update URL without refresh
+    window.history.pushState({}, '', `?steamId=${steamAccountId}`)
   }
 
   const handleMenuClick = (menu) => {
@@ -48,6 +62,7 @@ function App() {
             heroes={data.heroes}
             steamId={data.steamId}
             loading={loading}
+            onPlayerClick={handlePlayerClick}
           />
         )
       case 'matches':

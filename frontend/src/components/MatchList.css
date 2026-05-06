@@ -95,6 +95,12 @@
   color: #ffffff;
 }
 
+.hero-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .hero-gpm {
   font-size: 11px;
   color: #666666;
@@ -103,6 +109,13 @@
 .hero-xpm {
   font-size: 11px;
   color: #666666;
+}
+
+.award-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
 }
 
 /* Result Section */
@@ -182,23 +195,70 @@
   gap: 2px;
 }
 
-.imp-value {
-  font-size: 18px;
+.imp-label {
+  font-size: 11px;
   font-weight: 600;
-  color: #ffffff;
+}
+
+.imp-bar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+
+.imp-bar {
+  position: relative;
+  width: 70px;
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.imp-bar-negative {
+  position: absolute;
+  right: 50%;
+  top: 0;
+  bottom: 0;
+  background: #f5222d;
+  border-radius: 3px 0 0 3px;
+  transition: width 0.3s ease;
+}
+
+.imp-bar-positive {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  background: #52c41a;
+  border-radius: 0 3px 3px 0;
+  transition: width 0.3s ease;
+}
+
+.imp-bar-center {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #666;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.imp-value {
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .imp-value.positive {
-  color: #4caf50;
+  color: #52c41a;
 }
 
 .imp-value.negative {
-  color: #f44336;
-}
-
-.imp-label {
-  font-size: 11px;
-  color: #666666;
+  color: #f5222d;
 }
 
 /* KDA Section */
@@ -313,6 +373,35 @@
 
 .player-hero-name {
   color: #ffffff;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.player-name {
+  font-size: 10px;
+  color: #666666;
+}
+
+.player-name.clickable {
+  cursor: pointer;
+  color: #888888;
+  transition: color 0.2s;
+}
+
+.player-name.clickable:hover {
+  color: #e94560;
+  text-decoration: underline;
+}
+
+.player-award {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 2px;
 }
 
 .player-kda {
